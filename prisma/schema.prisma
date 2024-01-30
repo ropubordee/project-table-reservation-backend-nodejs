@@ -1,0 +1,97 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role{
+  USER
+  ADMIN
+}
+
+model User {
+  id             Int              @id @default(autoincrement())
+  firstname      String?           
+  lastname       String?
+  email          String           @unique
+  password       String              
+  phone          String
+  gender         String?
+  role           Role             @default(USER)
+  bookingHistory BookingHistory[]
+  reservations   Reservations[]
+}
+
+model TableType {
+  tabletype_id Int    @id @default(autoincrement())
+  table        Tables @relation(fields: [table_id], references: [table_id], onDelete: Cascade, onUpdate: Cascade)
+  table_id     Int
+  typetable    String
+  nots         String
+}
+
+model Tables {
+  table_id       Int              @id @default(autoincrement())
+  type           String
+  tableNumber    Int
+  capacity       Int
+  status         String
+  updatedAt      DateTime         @updatedAt
+  createdAt      DateTime         @default(now())             
+  tableType      TableType[]
+  tableStatus    TableStatus[]
+  reservations   Reservations[]
+  bookingHistory BookingHistory[]
+}
+
+model Reservations {
+  Reservationid       Int             @id @default(autoincrement())
+  user                User            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id             Int
+  table               Tables          @relation(fields: [table_id], references: [table_id], onDelete: Cascade, onUpdate: Cascade)
+  table_id            Int
+  paymentstatus       String
+  reservationDateTime DateTime
+  numberofGugest      Int
+  paymentStatus       PaymentStatus[]
+}
+
+model PaymentStatus {
+  paymentstatus_id Int              @id @default(autoincrement())
+  reservation      Reservations     @relation(fields: [reservation_id], references: [Reservationid], onDelete: Cascade, onUpdate: Cascade)
+  reservation_id   Int
+  statusmoney      String
+  paymentDateTime  DateTime
+  amount           Float
+  bookingHistory   BookingHistory[]
+}
+
+model TableStatus {
+  tablestatus_id  Int      @id @default(autoincrement())
+  table           Tables   @relation(fields: [table_id], references: [table_id], onDelete: Cascade, onUpdate: Cascade)
+  table_id        Int
+  statustabi      String
+  datetimechanged DateTime 
+  updatedAt       DateTime @updatedAt
+  createdAt       DateTime @default(now())
+}
+
+model BookingHistory {
+  booking_id          Int           @id @default(autoincrement())
+  user                User          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id             Int
+  table               Tables        @relation(fields: [table_id], references: [table_id], onDelete: Cascade, onUpdate: Cascade)
+  table_id            Int
+  reservationDateTime DateTime
+  numberofGuests      Int
+  paymentstatusid     PaymentStatus @relation(fields: [payment_status_id], references: [paymentstatus_id], onDelete: Cascade, onUpdate: Cascade)
+  payment_status_id   Int
+  updatedAt           DateTime @updatedAt
+  createdAt           DateTime @default(now())
+}
