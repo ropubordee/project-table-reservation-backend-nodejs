@@ -2,13 +2,14 @@ const createError = require("../utils/createError");
 
 const admin = async (req, res, next) => {
   try {
-    if (req.user.role === "ADMIN") {
+    console.log("Value of req.user:", req.user);
+    if (req.user && req.user.role === "ADMIN") {
       next();
-    } else{
-      return createError(403, "Forbidden");
+    } else {
+      return next(createError(403, "Forbidden"));
     }
-    next();
   } catch (err) {
+  
     next(err);
   }
 };

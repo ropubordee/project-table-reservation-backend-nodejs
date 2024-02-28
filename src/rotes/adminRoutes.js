@@ -8,7 +8,7 @@ const adminMiddlewares = require("../middlewares/admin")
 
 
 router.get("/table" ,adminMiddlewares,tablecontroller.getTables)
-router.post("create/:token",adminMiddlewares,tablecontroller.createTable)
+router.post("/create",adminMiddlewares,tablecontroller.createTable)
 router.put("/update/:id",adminMiddlewares,tablecontroller.updateTable)
 router.delete("/delete/:id",adminMiddlewares, tablecontroller.deleteTable)
 

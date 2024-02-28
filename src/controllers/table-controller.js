@@ -12,9 +12,10 @@ exports.getTables = async (req, res) => {
 
 exports.createTable = async (req,res,next) =>{
   const data = req.body
+  console.log(req.body)
   try {
     const rs = await prisma.tables.create({
-      data : {...data,userId: req.user.id}
+      data : {...data}
     })
     res.json({message: "Create OK",result : rs})
   } catch (err) {
@@ -28,8 +29,8 @@ exports.updateTable = async (req, res, next) => {
   try {
     const rs = await prisma.tables.update({
       data :  {...data},
-      where: { id : +id , userId : req.user.id} 
-    })
+      where: { table_id : +id } 
+    });
     res.json({msg: 'Update ok', result: rs})
   }catch(err){
     next(err)
@@ -38,7 +39,7 @@ exports.updateTable = async (req, res, next) => {
 exports.deleteTable = async (req, res, next) => {
   const {id} = req.params
   try {
-    const rs = await prisma.tables.delete({ where : {id : +id, userId: req.user.id}})
+    const rs = await prisma.tables.delete({ where : {table_id : +id}})
     res.json({msg: 'Delete ok', result : rs})
   }catch(err) {
     next(err)
