@@ -65,19 +65,15 @@ exports.updateTable = async (req, res, next) => {
     }
 
     if (imagePaths.length > 0) {
-      // ตรวจสอบว่ามีรูปภาพเดิมหรือไม่
       const existingImages = await prisma.image.findMany({
         where: { table_id: parseInt(id) },
       });
 
-      // ถ้ามีรูปภาพเดิมให้ลบออก
       if (existingImages.length > 0) {
         await prisma.image.deleteMany({
           where: { table_id: parseInt(id) },
         });
       }
-
-      // สร้างรูปภาพใหม่
       const createdImages = await Promise.all(imagePaths.map(async (path) => {
         return await prisma.Image.create({
           data: {
@@ -86,8 +82,6 @@ exports.updateTable = async (req, res, next) => {
           },
         });
       }));
-
-      // เพิ่มข้อมูลรูปภาพใหม่ลงใน updateData
       updateData = {
         ...updateData,
         image: {
@@ -95,8 +89,6 @@ exports.updateTable = async (req, res, next) => {
         },
       };
     }
-
-    // ทำการอัพเดทข้อมูลในตาราง
     const updatedTable = await prisma.tables.update({
       data: {
         ...updateData,
