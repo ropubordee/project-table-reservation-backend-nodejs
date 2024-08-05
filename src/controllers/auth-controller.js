@@ -10,10 +10,14 @@ exports.register = async (req, res, next) => {
     const { firstname,lastname,email, password,phone,gender } = req.body;
     console.log(req.body)
 
+    
+    if (!firstname || !lastname) {
+     return createError(400, "Invalid firstname or lastname");
+    }
+
     if (!email || !password || !phone) {
       return createError(400, "Email and password are required");
     }
-
     if (typeof email !== "string" || typeof password !== "string" || typeof phone !== "string" || typeof firstname !== "string"|| typeof lastname !== "string" || typeof gender!== "string" ) {
       return createError(400, "Email or password is invalid");
     }

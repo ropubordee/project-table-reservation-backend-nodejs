@@ -40,3 +40,8 @@ exports.updaterole = (userId,newRole) =>{
     }
   });
 }
+
+exports.getAllUsers = () =>{
+
+  return prisma.user.findMany();
+}

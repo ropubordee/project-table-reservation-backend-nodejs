@@ -13,5 +13,6 @@ router.get("/table" ,adminMiddlewares,tablecontroller.getTables)
 router.post("/create",adminMiddlewares,tablecontroller.createTable)
 router.put("/update/:id",uploads.array("images"),adminMiddlewares,tablecontroller.updateTable)
 router.delete("/delete/:id",adminMiddlewares, tablecontroller.deleteTable)
+router.get("/all-status",adminMiddlewares,tablecontroller.status)
 
 module.exports = router;

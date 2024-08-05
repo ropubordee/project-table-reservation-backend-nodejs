@@ -10,10 +10,127 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  USER
-  ADMIN
-}
+// model User {
+//   id             Int              @id @default(autoincrement())
+//   firstname      String?
+//   lastname       String?
+//   email          String           @unique
+//   password       String
+//   phone          String
+//   gender         String?           
+//   bookingHistory BookingHistory[]
+//   reservations   Reservations[]
+// }
+// model Role{
+//   id Int @id @default(autoincrement())
+//   role_name  String 
+//   role_description String
+//   status String
+//   create_by String
+//   create_date DateTime
+//   update_by String
+//   update_date DateTime
+// }
+
+// model user_detail{
+//   id    Int @id @default(autoincrement())
+//   user_id Int
+//   frist_name String
+//   last_name String
+//   phone String
+//   age String
+//   create_by String
+//   create_date DateTime
+//   update_by String
+//   update_date DateTime
+// }
+
+// model Tables {
+//   table_id       Int              @id @default(autoincrement())
+//   type           String
+//   tableNumber    String
+//   capacity       Int
+//   status         String
+//   price          Float
+//   nots           String?
+//   updatedAt      DateTime         @updatedAt
+//   createdAt      DateTime         @default(now())
+//   tableStatus    TableStatus[]
+//   reservations   Reservations[]
+//   bookingHistory BookingHistory[]
+//   image          Image[]
+//   PaymentStatus  PaymentStatus[]
+// }
+
+// model Image {
+//   image_id  Int      @id @default(autoincrement())
+//   path      String
+//   table_id  Int
+//   createdAt DateTime @default(now())
+//   tables    Tables   @relation(fields: [table_id], references: [table_id], onDelete: Cascade, onUpdate: Cascade)
+// }
+
+// model Reservations {
+//   reservationid       Int              @id @default(autoincrement())
+//   user                User             @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+//   user_id             Int
+//   tables              Tables           @relation(fields: [table_id], references: [table_id], onDelete: Cascade, onUpdate: Cascade)
+//   table_id            Int
+//   reservationDateTime DateTime         @default(now())
+//   bookingDate         DateTime
+//   numberofGugest      Int
+//   paymentStatus       PaymentStatus[]
+//   BookingHistory      BookingHistory[]
+// }
+
+// enum StatusMoney {
+//   PAID
+//   UNPAID
+//   PENDING
+// }
+
+// model PaymentStatus {
+//   paymentstatus_id Int              @id @default(autoincrement())
+//   reservation      Reservations     @relation(fields: [reservation_id], references: [reservationid], onDelete: Cascade, onUpdate: Cascade)
+//   reservation_id   Int
+//   table            Tables           @relation(fields: [table_id], references: [table_id], onDelete: Cascade, onUpdate: Cascade)
+//   table_id         Int
+//   statusmoney      StatusMoney      @default(UNPAID)
+//   paymentDateTime  DateTime
+//   price            Float
+//   bookingHistory   BookingHistory[]
+// }
+
+// model TableStatus {
+//   tablestatus_id  Int           @id @default(autoincrement())
+//   tables          Tables        @relation(fields: [table_id], references: [table_id], onDelete: Cascade, onUpdate: Cascade)
+//   table_id        Int
+//   tableStatus     TableStatEnum
+//   datetimechanged DateTime      @updatedAt
+//   createdAt       DateTime      @default(now())
+// }
+
+// enum TableStatEnum {
+//   FREE
+//   RESERVED
+// }
+
+// model BookingHistory {
+//   booking_id          Int           @id @default(autoincrement())
+//   user                User          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+//   user_id             Int
+//   tables              Tables        @relation(fields: [table_id], references: [table_id], onDelete: Cascade, onUpdate: Cascade)
+//   table_id            Int
+//   reservation         Reservations  @relation(fields: [reservation_id], references: [reservationid], onDelete: Cascade, onUpdate: Cascade)
+//   reservation_id      Int
+//   reservationDateTime DateTime      @default(now())
+//   paymentstatusid     PaymentStatus @relation(fields: [payment_status_id], references: [paymentstatus_id], onDelete: Cascade, onUpdate: Cascade)
+//   payment_status_id   Int
+//   updatedAt           DateTime      @updatedAt
+//   createdAt           DateTime      @default(now())
+// }
+
+// DB อันใหม่
 
 model User {
   id             Int              @id @default(autoincrement())
@@ -23,84 +140,117 @@ model User {
   password       String
   phone          String
   gender         String?
-  role           Role             @default(USER)
+  roleid         Int
+  role           Role             @relation(fields: [roleid], references: [id], onDelete: Cascade, onUpdate: Cascade)
   bookingHistory BookingHistory[]
   reservations   Reservations[]
+  userDetail     user_detail[]
+  Payment        Payment[]
 }
 
-model TableType {
-  tabletype_id Int    @id @default(autoincrement())
-  table        Tables @relation(fields: [table_id], references: [table_id], onDelete: Cascade, onUpdate: Cascade)
-  table_id     Int
-  typetable    String
-  nots         String
+model Role {
+  id               Int      @id @default(autoincrement())
+  role_name        String
+  role_description String
+  status           String
+  create_by        String
+  create_date      DateTime
+  update_by        String
+  update_date      DateTime
+  users            User[]
+}
+
+model user_detail {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  first_name  String
+  last_name   String
+  phone       String
+  age         String
+  create_by   String
+  create_date DateTime
+  update_by   String
+  update_date DateTime
 }
 
 model Tables {
-  table_id       Int              @id @default(autoincrement())
-  type           String
-  tableNumber    Int
-  capacity       Int
-  status         String
-  updatedAt      DateTime         @updatedAt
-  createdAt      DateTime         @default(now())
-  tableType      TableType[]
-  tableStatus    TableStatus[]
-  reservations   Reservations[]
-  bookingHistory BookingHistory[]
-  image          Image[]
+  id             Int              @id @default(autoincrement())
+  tables_type_id Int
+  Tables_type_id Tables_type      @relation(fields: [tables_type_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  tableNumber    String            // หมายเลขโต๊ะ
+  capacity       String            // จำนวนแขกที่โต๊ะสามารถรับได้
+  status         String            // สถานะ 
+  price          Float             // ราคา
+  nots           String?           // โน๊ตบอกเผี่อห้องมีอะไรผิดปกติไว้แจ้งลูกค้า
+  create_by      String             
+  create_date    String
+  update_by      String
+  update_date    DateTime
+  tables_image   tables_image[]
+  Reservations   Reservations[]
 }
 
-model Image {
-  image_id  Int      @id @default(autoincrement())
-  path      String
-  table_id  Int
-  createdAt DateTime @default(now())
-  tables    Tables   @relation(fields: [table_id], references: [table_id], onDelete: Cascade, onUpdate: Cascade)
+model Tables_type {
+  id               Int      @id @default(autoincrement())
+  tables_type_name String
+  tables_type_desc String
+  capacity         Int
+  status           String
+  create_by        String
+  create_date      DateTime
+  update_by        String
+  update_date      DateTime
+  Tables           Tables[]
+}
+
+model tables_image {
+  id              Int      @id @default(autoincrement())
+  table_id        Int
+  Tables_id       Tables   @relation(fields: [table_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  table_img_path  String
+  table_img_name  String
+  status          String
+  tables_img_data String
+  create_by       String
+  create_date     DateTime
+  update_by       String
+  update_date     DateTime
 }
 
 model Reservations {
-  Reservationid       Int             @id @default(autoincrement())
-  user                User            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user_id             Int
-  table               Tables          @relation(fields: [table_id], references: [table_id], onDelete: Cascade, onUpdate: Cascade)
-  table_id            Int
-  paymentstatus       String
-  reservationDateTime DateTime
-  numberofGugest      Int
-  paymentStatus       PaymentStatus[]
+  id             Int              @id @default(autoincrement())
+  user           User             @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id        Int              // id ผู้ใช้
+  tables         Tables           @relation(fields: [table_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  table_id       Int              // id โต๊ะ
+  bookingDate    DateTime         // เวลาจอง (เป็น form ให้ User กรอกเข้ามา **หน้าบ้าน font-end)
+  startTime      DateTime         // เวลาเริ่มใช้โต๊ะ
+  endTime        DateTime         // เวลาสิ้นสุดการใช้โต๊ะ
+  Payment        Payment[]
+  BookingHistory BookingHistory[]
 }
 
-model PaymentStatus {
-  paymentstatus_id Int              @id @default(autoincrement())
-  reservation      Reservations     @relation(fields: [reservation_id], references: [Reservationid], onDelete: Cascade, onUpdate: Cascade)
-  reservation_id   Int
-  statusmoney      String
-  paymentDateTime  DateTime
-  amount           Float
-  bookingHistory   BookingHistory[]
-}
-
-model TableStatus {
-  tablestatus_id  Int      @id @default(autoincrement())
-  table           Tables   @relation(fields: [table_id], references: [table_id], onDelete: Cascade, onUpdate: Cascade)
-  table_id        Int
-  statustabi      String
-  datetimechanged DateTime
-  updatedAt       DateTime @updatedAt
-  createdAt       DateTime @default(now())
+model Payment {
+  id              Int              @id @default(autoincrement())
+  reservation     Reservations     @relation(fields: [reservation_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  reservation_id  Int // id การจอง
+  user_id         Int // id ผู้ใช้
+  user            User             @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  statuspayment   String // สถานะการโอน  
+  DateTimepayment DateTime // วันที่จ่าย
+  pricepayment    Float // ราคาจ่าย
+  BookingHistory  BookingHistory[]
 }
 
 model BookingHistory {
-  booking_id          Int           @id @default(autoincrement())
-  user                User          @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  user_id             Int
-  table               Tables        @relation(fields: [table_id], references: [table_id], onDelete: Cascade, onUpdate: Cascade)
-  table_id            Int
-  reservationDateTime DateTime
-  numberofGuests      Int
-  paymentstatusid     PaymentStatus @relation(fields: [payment_status_id], references: [paymentstatus_id], onDelete: Cascade, onUpdate: Cascade)
-  payment_status_id   Int
-  updatedAt           DateTime      @updatedAt
-  createdAt           DateTime      @default(now())
+  booking_id        Int          @id @default(autoincrement())
+  user              User         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user_id           Int           //  id ผู้ใช้
+  reservation       Reservations @relation(fields: [reservation_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  reservation_id    Int           // id การจอง
+  paymentstatusid   Payment      @relation(fields: [payment_status_id], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  payment_status_id Int           // id การจ่ายเงิน
+  updatedAt         DateTime     @updatedAt    // เวลาอัพเดท
+  createdAt         DateTime     @default(now()) //เวลาสร้าง 
 }

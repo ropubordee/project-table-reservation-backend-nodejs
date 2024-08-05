@@ -19,3 +19,13 @@ exports.updateUserRole = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.gatAllusers = async (req,res,next) =>{
+
+  try {
+    const  users = await userService.getAllUsers();
+    res.json(users)
+  } catch (err) {
+    next (err)
+  }
+}

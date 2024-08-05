@@ -1,4 +1,5 @@
 const prisma = require("../config/prisma");
+const {TableStatEnum} = require("@prisma/client")
 
 
 
@@ -12,6 +13,30 @@ exports.getTables = async (req, res) => {
   res.json({responseData});
 };
 
+exports.getTableById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const table = await prisma.tables.findUnique({
+      where: {
+        table_id: parseInt(id),
+      },
+      include: {
+        image: true, 
+      },
+    });
+  
+    if (!table) {
+      return res.status(404).json({ error: 'Table not found' });
+    }
+  
+    res.json({ table });
+  } catch (error) {
+    console.error('Error fetching table details:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+
 exports.uploadImages = async (req, res, next) => {
   try {
     const image = req.files;
@@ -22,21 +47,27 @@ exports.uploadImages = async (req, res, next) => {
     }
     const imagePaths = image.map((image) => image.path);
     const data = req.body;
-    data.tableNumber = parseInt(data.tableNumber, 10);
+  
     data.capacity = parseInt(data.capacity, 10);
+    data.price = parseFloat(data.price, 10);
 
+    // สร้างโต๊ะใหม่และเชื่อมโยงกับสถานะของโต๊ะ
     const rs = await prisma.tables.create({
       data: {
         ...data,
-        image: { createMany: { data : imagePaths.map((path)=> ({path}))} },  
+        image: { createMany: { data: imagePaths.map((path) => ({ path })) } },
+        tableStatus: {
+          create: { tableStatus: data.status }
+        }
       },
     });
 
-    res.status(200).json({ message: 'Tables created successfully', result: rs });
+    res.status(200).json({ message: 'Table created successfully', result: rs });
   } catch (err) {
     next(err);
   }
 };
+
 exports.createTable = async (req, res, next) => {
   try {
     const data = req.body;
@@ -46,6 +77,7 @@ exports.createTable = async (req, res, next) => {
       data: { ...data }
     });
 
+    
     res.json({ message: 'Create OK', result: rs });
   } catch (err) {
     next(err);
@@ -92,8 +124,11 @@ exports.updateTable = async (req, res, next) => {
     const updatedTable = await prisma.tables.update({
       data: {
         ...updateData,
-        tableNumber: parseInt(updateData.tableNumber),
         capacity: parseInt(updateData.capacity),
+        price: parseFloat(updateData.price),
+        tableStatus : {
+          create : {tableStatus : data.status}
+        }
       },
       where: { table_id: +id },
     });
@@ -133,6 +168,11 @@ exports.uploadImagesTable = async (req,res,next) =>{
     next(err)
   }
 }
+
+exports.status = async (req,res,next) => {
+  res.json ({status : Object.values(TableStatEnum)})
+}
+
 
 
 
